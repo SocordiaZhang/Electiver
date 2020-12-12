@@ -33,6 +33,10 @@
 
         </activity>
 
+        <activity android:name="com.example.electiver.DeadlineActivity">
+
+        </activity>
+
     </application>
 
 </manifest>
