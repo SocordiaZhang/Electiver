@@ -23,6 +23,7 @@
             </intent-filter>
         </activity>
         <activity
+<<<<<<< HEAD
             android:name=".LoginActivity"
             android:screenOrientation="portrait"></activity>
         <activity
@@ -31,6 +32,12 @@
         <activity
             android:name=".DeadlineActivity"
             android:screenOrientation="portrait"></activity>
-    </application>
 
-</manifest>
+        </activity>
+
+
+        </activity>
+
+
+>>>>>>> 26f9535a2721d59f9eb080f02b2ad21ad5ae9018
+    </application>
