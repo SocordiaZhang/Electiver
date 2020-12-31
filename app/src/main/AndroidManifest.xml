@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.electiver">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name=".config.MyApplication"
         android:allowBackup="true"
@@ -10,8 +12,9 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Electiver">
-        <activity android:name=".CommentActivity"></activity>
+        android:theme="@style/Theme.Electiver"
+        android:usesCleartextTraffic="true">
+
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -31,6 +34,19 @@
         <activity
             android:name=".DeadlineActivity"
             android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".EditDeadlineActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".CommentActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".MyCommentActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".TimeSelectActivity"
+            android:screenOrientation="portrait"></activity>
 
     </application>
+
 </manifest>
