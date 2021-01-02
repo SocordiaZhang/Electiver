@@ -240,17 +240,6 @@ public class AccountFragment extends Fragment {
      */
     //ddl的入口
     private void test_only(){
-        Button to_my_comment = (Button)view.findViewById(R.id.enter);
-        to_my_comment.setVisibility(View.VISIBLE);
-        to_my_comment.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getContext(), DeadlineActivity.class);
-                intent.putExtra("course_id", "04832191");
-                intent.putExtra("course_name", "软件工程");
-                startActivity(intent);
-            }
-        });
     }
     //Test End
 }

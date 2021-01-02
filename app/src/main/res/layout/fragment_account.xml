@@ -7,15 +7,6 @@
     tools:context=".ui.account.AccountFragment">
 
    <Button
-       android:id="@+id/enter"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:text="ddl入口"
-       android:visibility="gone"
-       app:layout_constraintBottom_toBottomOf="parent"
-       app:layout_constraintStart_toStartOf="parent" />
-
-   <Button
        android:id="@+id/toMyComment"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
