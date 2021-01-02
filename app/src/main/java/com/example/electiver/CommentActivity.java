@@ -129,7 +129,7 @@ public class CommentActivity extends AppCompatActivity {
                         }
                         else {
                             Looper.prepare();
-                            Toast.makeText(c, "评论成功", Toast.LENGTH_LONG).show();
+                            Toast.makeText(c, "评论成功，退出重进即可查看", Toast.LENGTH_LONG).show();
                             text_add_comment.setText("点此输入评论");
                         }
                         Looper.loop();

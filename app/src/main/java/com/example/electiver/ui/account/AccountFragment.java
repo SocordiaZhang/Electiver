@@ -3,14 +3,9 @@ package com.example.electiver.ui.account;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.util.Pair;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,28 +15,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.example.electiver.DeadlineActivity;
+import com.example.electiver.ForgetPswActivity;
 import com.example.electiver.HttpThread;
 import com.example.electiver.LoginActivity;
-import com.example.electiver.MainActivity;
 import com.example.electiver.MyCommentActivity;
-import com.example.electiver.PasswordChangeActivity;
 import com.example.electiver.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Vector;
@@ -70,6 +56,7 @@ public class AccountFragment extends Fragment {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        if (class_info == null) return view;
         set_class_list();
 
         test_only();//正常使用时需要注释掉这一行
@@ -80,6 +67,7 @@ public class AccountFragment extends Fragment {
     /*
      * 从服务器获取需要的量
      */
+    Vector<JSONObject> CLASS_JSON;
     String[] class_info;
     private void get_class_list() throws JSONException {
         //
@@ -105,41 +93,14 @@ public class AccountFragment extends Fragment {
         }
         JSONObject json = new JSONObject(result[0]);
         Iterator iterator = json.keys();
-        Vector<JSONArray> CLASS_JSON = new Vector<JSONArray>();
+        CLASS_JSON = new Vector<JSONObject>();
         while(iterator.hasNext()){
             String key = (String) iterator.next();
-            CLASS_JSON.add(json.getJSONArray(key));
+            CLASS_JSON.add(json.getJSONObject(key));
         }
         class_info = new String[CLASS_JSON.size()];
-        thread = new HttpThread(){
-            @Override
-            public void run(){
-                ArrayList<Pair<String, String>> para = new ArrayList<Pair<String, String>>();
-                for (int i = 0; i < CLASS_JSON.size(); i++) {
-                    para.add(0, Pair.create("token", Token));
-                    try {
-                        para.add(1,Pair.create("cid", (String)CLASS_JSON.get(i).get(0)));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    class_info[i] = doCourseQuery(para);
-                    JSONObject json = null;
-                    try {
-                        json = new JSONObject(class_info[i]);
-                        json = json.getJSONObject("0");
-                        class_info[i] = json.getString("name");
-                        Log.d("cid2name", class_info[i]);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        };
-        thread.start();
-        try {
-            Thread.sleep( 500 );
-        } catch (Exception e){
-            System.exit( 0 ); //退出程序
+        for (int i = 0; i < CLASS_JSON.size(); i ++) {
+            class_info[i] = CLASS_JSON.get(i).getString("name");
         }
         //网络有点bug拿不到cid，之后是假数据生成
         /*
@@ -184,7 +145,7 @@ public class AccountFragment extends Fragment {
         edit_psw.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getContext(), PasswordChangeActivity.class);
+                Intent intent = new Intent(getContext(), ForgetPswActivity.class);
                 startActivity(intent);
             }
         });

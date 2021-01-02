@@ -11,6 +11,7 @@
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
        android:text="ddl入口"
+       android:visibility="gone"
        app:layout_constraintBottom_toBottomOf="parent"
        app:layout_constraintStart_toStartOf="parent" />
 
@@ -87,7 +88,7 @@
              android:layout_marginStart="16dp"
              android:layout_marginLeft="16dp"
              android:layout_marginTop="10dp"
-             android:text="我选过的课："
+             android:text="我正在上的课："
              android:textSize="18sp"
              app:layout_constraintStart_toStartOf="parent"
              app:layout_constraintTop_toBottomOf="@+id/grade" />
