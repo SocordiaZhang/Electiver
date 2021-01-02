@@ -21,7 +21,7 @@
        android:layout_marginEnd="16dp"
        android:layout_marginRight="16dp"
        android:layout_marginBottom="8dp"
-       android:text="查看我的评论"
+       android:text="查看评论"
        app:backgroundTint="#8B0012"
        app:layout_constraintBottom_toBottomOf="parent"
        app:layout_constraintEnd_toEndOf="parent" />
@@ -56,6 +56,17 @@
           android:id="@+id/infoLayout"
           android:layout_width="match_parent"
           android:layout_height="match_parent">
+
+         <LinearLayout
+             android:id="@+id/classList"
+             android:layout_width="0dp"
+             android:layout_height="wrap_content"
+             android:layout_marginTop="5dp"
+             android:orientation="vertical"
+             app:layout_constraintEnd_toEndOf="parent"
+             app:layout_constraintHorizontal_bias="1.0"
+             app:layout_constraintStart_toStartOf="parent"
+             app:layout_constraintTop_toBottomOf="@+id/listStart"></LinearLayout>
 
          <TextView
              android:id="@+id/grade"
@@ -163,7 +174,7 @@
        android:layout_marginEnd="5dp"
        android:layout_marginRight="5dp"
        android:layout_marginBottom="8dp"
-       android:text="设置新的密码"
+       android:text="修改密码"
        app:backgroundTint="@color/pkured"
        app:layout_constraintBottom_toBottomOf="parent"
        app:layout_constraintEnd_toStartOf="@+id/toMyComment" />

@@ -107,8 +107,6 @@ public class DeadlineActivity extends AppCompatActivity {
         };
         thread.start();
 
-        //我没有拿到过后端返回给我的数据所以具体是什么数据格式我不太清楚
-        //这里我假设他把所有的ddl都作为JSONArray返回给我
         try {
             Thread.sleep( 1000 );
         } catch (Exception e){
@@ -150,6 +148,7 @@ public class DeadlineActivity extends AppCompatActivity {
                 Intent intent = new Intent(DeadlineActivity.this, EditDeadlineActivity.class);
                 intent.putExtra("edit_add", "add");
                 intent.putExtra("cid", course_id);
+                intent.putExtra("course_name", course_name);
                 startActivity(intent);
                 DeadlineActivity.this.finish();
             }

@@ -121,9 +121,6 @@ public class ElectiveAssistantFragment extends Fragment {
                                 Toast.LENGTH_LONG).show();
                         searchwhich=-1;
                     }else{
-
-                        // Toast.makeText(getContext(),"请点击显示查看推荐结果",
-                        //         Toast.LENGTH_LONG).show();
                         searchwhich=0;
                     }
                 }
@@ -135,8 +132,8 @@ public class ElectiveAssistantFragment extends Fragment {
                     freshCourseList(view,mDatas);
                     searchwhich=-1;
                 }else{
-                    // Toast.makeText(getContext(), "开始搜索",
-                    //         Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "开始搜索",
+                            Toast.LENGTH_SHORT).show();
                     if(token.equals("none")){
                         Toast.makeText(getContext(), "Token失效，请重新登录",
                                 Toast.LENGTH_SHORT).show();
@@ -268,6 +265,68 @@ public class ElectiveAssistantFragment extends Fragment {
                 }
             }
         });
+
+
+    /*    end_search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SharedPreferences saveResult= getActivity().getSharedPreferences("courseInfo",getActivity().MODE_PRIVATE);
+                String getResult;
+                try{
+                    FileInputStream readFile = getContext().openFileInput("tmpCourseData.txt");
+                    byte[] resultByte = new byte[readFile.available()];
+                    readFile.read(resultByte);
+                    getResult = new String(resultByte);
+                    Log.d("fileOutput",getResult);
+
+                    if(getResult.equals("null")){
+                        Toast.makeText(getContext(), "正在搜索中，请稍后重试",
+                                Toast.LENGTH_SHORT).show();
+                    }else if(getResult.equals("{}")){
+                        Toast.makeText(getContext(), "没有符合条件的课程",
+                                Toast.LENGTH_SHORT).show();
+                    }else if(getResult.equals("")){
+                        Toast.makeText(getContext(),"no Result",
+                                Toast.LENGTH_SHORT).show();
+                    }else{
+
+                        try{
+                            JSONObject jsonObject = new JSONObject(getResult);
+                            List<Course> myCourseData=new ArrayList<Course>();
+                            int num = jsonObject.length();
+                            int count=0;
+                            int i=0;
+                            while(true){
+                                String info = jsonObject.getString(String.valueOf(i));
+                                Course course = new Course();
+                                course.SetAllAttr(info);
+                                if(course.ifOktoAddCourse(getContext())){
+                                    myCourseData.add(course);
+                                    count++;
+                                }
+                                if(count==30) break;
+                                i++;
+                                if(i==num) break;
+                            }
+                            if(count==0){
+                                Toast.makeText(getContext(), "所有课程均与您的课表冲突",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                            Log.d("checkSearch",String.valueOf(count));
+                            freshCourseList(view, myCourseData);
+                            getContext().deleteFile("tmpCourseData.txt");
+                        } catch (JSONException e){
+                            e.printStackTrace();
+                        }
+                    }
+                }catch(IOException e){
+                    e.printStackTrace();
+                }
+
+
+
+            }
+        });*/
 
 
 

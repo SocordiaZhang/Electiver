@@ -159,7 +159,7 @@ public class ListViewAdapter extends BaseSwipeAdapter {
                 new HttpThread(){
                     @Override
                     public void run(){
-                        doInsertCourse(getToken,getCid);
+                        doInsertCourse(getToken,obj);
                     }
                 }.start();
 
@@ -199,13 +199,14 @@ public class ListViewAdapter extends BaseSwipeAdapter {
                 new HttpThread(){
                     @Override
                     public void run(){
-                        doInsertOldCourse(getToken,getCid);
+                        doInsertOldCourse(getToken,obj);
                     }
                 }.start();
 
                 mDatas.remove(obj);
                 notifyDataSetChanged();
                 sl.close();
+
             }
         });
         final TextView courseInfo = (TextView) convertView.findViewById(R.id.swipe_checkComment);

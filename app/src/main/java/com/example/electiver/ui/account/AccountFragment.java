@@ -1,20 +1,29 @@
 package com.example.electiver.ui.account;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.util.Pair;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -24,55 +33,158 @@ import com.example.electiver.HttpThread;
 import com.example.electiver.LoginActivity;
 import com.example.electiver.MainActivity;
 import com.example.electiver.MyCommentActivity;
+import com.example.electiver.PasswordChangeActivity;
 import com.example.electiver.R;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Vector;
 
 public class AccountFragment extends Fragment {
+    //------本页面需要修改get_class_list()
+    //------使用ctrl+f寻找以便修改
     View view;
     String Token;
-    TextView test;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
         view = inflater.inflate(R.layout.fragment_account, container, false);
 
+
         //保险起见，每次createView时从SP中重新读取数据
         getValueRefreshed();
 
-        init();
-        /*
-         * Test Only
-         */
-        //ddl的入口
-        Button to_my_comment = (Button)view.findViewById(R.id.enter);
-        to_my_comment.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getContext(), DeadlineActivity.class);
-                intent.putExtra("course_id", "04832191");
-                intent.putExtra("course_name", "软件工程");
-                startActivity(intent);
-            }
-        });
-        /*
-         * Test Only
-         */
+        SharedPreferences getToken = getActivity().getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
+        Token = getToken.getString("Token","null");
+
+        connect_other_activity();
+        try {
+            get_class_list();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        set_class_list();
+
+        test_only();//正常使用时需要注释掉这一行
         return view;
     }
 
-    private void init(){
+
+    /*
+     * 从服务器获取需要的量
+     */
+    String[] class_info;
+    private void get_class_list() throws JSONException {
+        //
+        final String[] result = new String[1];
+        result[0] = "";
+        HttpThread thread = new HttpThread(){
+            @Override
+            public void run(){
+                result[0] = doQueryMyCourse(Token);
+                Log.d("queryCourse", result[0]);
+            }
+        };
+        thread.start();
+        try {
+            Thread.sleep( 500 );
+        } catch (Exception e){
+            System.exit( 0 ); //退出程序
+        }
+
+        if(result[0].equals("")) {
+            class_info = new String[0];
+            return ;
+        }
+        JSONObject json = new JSONObject(result[0]);
+        Iterator iterator = json.keys();
+        Vector<JSONArray> CLASS_JSON = new Vector<JSONArray>();
+        while(iterator.hasNext()){
+            String key = (String) iterator.next();
+            CLASS_JSON.add(json.getJSONArray(key));
+        }
+        class_info = new String[CLASS_JSON.size()];
+        thread = new HttpThread(){
+            @Override
+            public void run(){
+                ArrayList<Pair<String, String>> para = new ArrayList<Pair<String, String>>();
+                for (int i = 0; i < CLASS_JSON.size(); i++) {
+                    para.add(0, Pair.create("token", Token));
+                    try {
+                        para.add(1,Pair.create("cid", (String)CLASS_JSON.get(i).get(0)));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    class_info[i] = doCourseQuery(para);
+                    JSONObject json = null;
+                    try {
+                        json = new JSONObject(class_info[i]);
+                        json = json.getJSONObject("0");
+                        class_info[i] = json.getString("name");
+                        Log.d("cid2name", class_info[i]);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        };
+        thread.start();
+        try {
+            Thread.sleep( 500 );
+        } catch (Exception e){
+            System.exit( 0 ); //退出程序
+        }
+        //网络有点bug拿不到cid，之后是假数据生成
+        /*
+         * Test Only
+        class_info = new String[3];
+        class_info[0] = "软件工程";
+        class_info[1] = "太极拳";
+        class_info[2] = "计算机网络";*/
+        //Test End
+    }
+    /*
+     * 动态生成课程列表
+     */
+    private void set_class_list() {
+        LinearLayout list = view.findViewById(R.id.classList);
+
+        Button class_name;
+        for (int i = 0; i < class_info.length; i ++) {
+            class_name = new Button(getContext());
+            class_name.setText(class_info[i]);
+            class_name.setTextColor(0xFFFFFFFF);
+            list.addView(class_name);
+        }
+    }
+
+    /*
+     * 与其他活动相连接
+     */
+    private void connect_other_activity() {
         //查看评论界面的入口
         Button to_my_comment = (Button)view.findViewById(R.id.toMyComment);
         to_my_comment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getContext(), MyCommentActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        //修改密码界面的入口
+        Button edit_psw = (Button)view.findViewById(R.id.selfManage);
+        edit_psw.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), PasswordChangeActivity.class);
                 startActivity(intent);
             }
         });
@@ -161,4 +273,24 @@ public class AccountFragment extends Fragment {
             Log.d("bundle","nodatatomain");
         }
     }
+
+    /*
+     * Test Only 一般情况下界面的进入控件会隐藏
+     */
+    //ddl的入口
+    private void test_only(){
+        Button to_my_comment = (Button)view.findViewById(R.id.enter);
+        to_my_comment.setVisibility(View.VISIBLE);
+        to_my_comment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), DeadlineActivity.class);
+                intent.putExtra("course_id", "04832191");
+                intent.putExtra("course_name", "软件工程");
+                startActivity(intent);
+            }
+        });
+    }
+    //Test End
 }
+

@@ -97,6 +97,11 @@ public class MyCommentActivity extends AppCompatActivity {
             }
         };
         thread.start();
+        try {
+            Thread.sleep( 1000 );
+        } catch (Exception e){
+            System.exit( 0 ); //退出程序
+        }
 
         class_comment = new String[my_comment.size()];
 
@@ -118,10 +123,6 @@ public class MyCommentActivity extends AppCompatActivity {
 
     private void dynamic_create_View() {
         //设置按钮格式
-        GradientDrawable draw = new GradientDrawable();
-        draw.setShape(GradientDrawable.RECTANGLE);
-        draw.setColor(0xFF8B0012);
-        draw.setCornerRadius(20);
         for (int i = 0; i < class_comment.length; i ++) {
             textViews_comment[i] = new TextView(this);
             textViews_comment[i].setText(class_comment[i]);
@@ -152,15 +153,15 @@ public class MyCommentActivity extends AppCompatActivity {
                         @Override
                         public void start(){
                             int res = doDeleteComment(Token, comment_key.get(finalI));
-                            TextView test = (TextView)findViewById(R.id.titleComment);
-                            test.setText(String.valueOf(res));
+                            Log.d("deleteComment", String.valueOf(res));
+                            textViews_comment[finalI].setVisibility(View.INVISIBLE);
+                            buttons_delete[finalI].setVisibility(View.INVISIBLE);
                         }
                     };
                     thread.start();
                     //MyCommentActivity.this.finish();
                 }
             });
-            buttons_delete[i].setBackground(draw);
             buttons_delete[i].setTextColor(Color.WHITE);
             buttons_delete[i].setId(IDUtils.generateViewId());
             constraintLayout_list.addView(buttons_delete[i]);

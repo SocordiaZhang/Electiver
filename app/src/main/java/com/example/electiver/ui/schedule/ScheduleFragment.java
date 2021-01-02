@@ -66,10 +66,11 @@ public class ScheduleFragment extends Fragment {
         getCourse = mContext.getSharedPreferences("courseInfo", mContext.MODE_PRIVATE);
         System.out.println(getCourse.getString("courseNum", "0"));
 
-        // System.out.println(key_value.size());
+
         this.user_schedule = new UserSchedule(getCourse);
         this.num_course = user_schedule.num;
         this.num_class = user_schedule.btn_num;
+        System.out.println(num_course);
         course_nos = new boolean[20];
         this.btn_classes = new Button[42];
         this.btn_delete_texts = new Button[42];
@@ -87,6 +88,7 @@ public class ScheduleFragment extends Fragment {
             for (int j = 0; j < course.num_time; j++)
                 btn_nos[j] = j + btn_cnt;
             for (int j = 0; j < course.num_time; j++) {
+                System.out.println(j);
                 UserSchedule.CourseTime time = course.time[j];
                 btn_classes[btn_cnt] = createButton(course.id, btn_cnt, course.no, course.name,
                         time.day, time.class_start, time.class_end, btn_nos);
@@ -247,9 +249,6 @@ public class ScheduleFragment extends Fragment {
         SharedPreferences.Editor editor_time = getTime.edit();
         Course course = new Course();
         course.SetAllAttr(user_schedule.getCourseByNo(course_no).courseInfo);
-        System.out.println(course.GetName());
-        System.out.println(course.GetTimetag1());
-        System.out.println(course.GetTimetag2());
         if(!course.GetTimetag1().equals("null")){
             editor_time.putString(course.GetTimetag1(), "false");
         }
@@ -302,7 +301,6 @@ class UserSchedule {
         String courseInfo;
 
         public OneCourse(int no, String id, String name, int num_time, CourseTime []time, String info) {
-            // System.out.println(id);
             this.no = no;
             this.id = new String(id);
             this.name = new String(name);
@@ -335,13 +333,13 @@ class UserSchedule {
             CourseTime []time = new CourseTime[7];
             for (int i = 0; i < 7; i++) {
                 if (my_course.hasDayClasses(i)) {
+                    System.out.println(my_course.daysClassTime(i));
                     String []start_end = my_course.daysClassTime(i).split("--|-");
                     for (int len = 0; len < start_end[1].length(); len++) {
                         if (!Character.isDigit(start_end[1].charAt(len))) {
                             start_end[1] = start_end[1].substring(0, len);
                         }
                     }
-                    System.out.println(my_course.daysClassTime(i));
                     time[time_cnt] = new CourseTime(i + 1, Integer.parseInt(start_end[0]), Integer.parseInt(start_end[1]));
                     time_cnt++;
                 }
