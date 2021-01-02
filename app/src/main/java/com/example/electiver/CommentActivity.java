@@ -3,7 +3,6 @@ package com.example.electiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Looper;
 import android.view.Gravity;
@@ -22,14 +21,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Vector;
 
 
 public class CommentActivity extends AppCompatActivity {
 
-    String Token;
+    String token;
     String cid;
 
     private ScrollView scroll;
@@ -46,7 +43,7 @@ public class CommentActivity extends AppCompatActivity {
     private class getCommentThread extends HttpThread {
         @Override
         public void run() {
-            String res_query_comment = doQueryComment(Token, cid);
+            String res_query_comment = doQueryComment(token, cid);
             // System.out.println(res_query_comment);
             try {
                 JSONObject comments = new JSONObject(res_query_comment);
@@ -82,7 +79,7 @@ public class CommentActivity extends AppCompatActivity {
         text.setText(name + " (" + teacher + ")");
 
         SharedPreferences getToken = this.getSharedPreferences("loginInfo", this.MODE_PRIVATE);
-        Token = getToken.getString("Token","null");
+        token = getToken.getString("Token","null");
 
         class_comment = new Vector<>();
 
@@ -124,7 +121,7 @@ public class CommentActivity extends AppCompatActivity {
                 new HttpThread() {
                     @Override
                     public void run(){
-                        int res = doSubmitComment(Token, cid, content);
+                        int res = doSubmitComment(token, cid, content);
                         if (res != 200) {
                             Looper.prepare();
                             Toast.makeText(c, "评论失败", Toast.LENGTH_LONG).show();

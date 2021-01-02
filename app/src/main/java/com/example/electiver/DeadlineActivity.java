@@ -21,17 +21,31 @@ import android.widget.Button;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Vector;
 
 public class DeadlineActivity extends AppCompatActivity {
+    //------本页面需要修改get_ddlList()
+    //------使用ctrl+f寻找以便修改
     protected void onCreate(Bundle saveInstanceState) {
         super.onCreate(saveInstanceState);
         setContentView(R.layout.activity_deadline);
 
         //初始化内部变量
         get_course_info();
-        get_ddlList();
+        try {
+            get_ddlList();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
+        if (ddl_id == null) return ;
         find_View();
         dynamic_create_View();
     }
@@ -43,7 +57,6 @@ public class DeadlineActivity extends AppCompatActivity {
     private String[] ddl_time;//ddl时间列表
     private String[] ddl_content;//ddl内容列表
     private Boolean[] ddl_state;//ddl完成状态
-    private String edit_add;//是修改(edit)还是添加(add)
 
     //--控件
     private TextView textView_courseName;
@@ -63,6 +76,7 @@ public class DeadlineActivity extends AppCompatActivity {
     }//希望能从课程表界面同时获得课程名称
 
     //--------前端与后端的接口
+    /* Test only
     private void get_ddlList() {
         ddl_id = new int[8];
         ddl_time = new String[8];
@@ -77,6 +91,49 @@ public class DeadlineActivity extends AppCompatActivity {
             ddl_time[i] = temp + String.valueOf(cnt) + "-00-00";
             ddl_content[i] = "这是一条ddl这是一条ddl这是一条ddl";
             ddl_state[i] = (i % 2 == 0);
+        }
+    }
+     */
+    private void get_ddlList() throws JSONException {
+        SharedPreferences getToken = getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
+        String Token = getToken.getString("Token","null");
+        final String[] result = new String[1];
+        HttpThread thread = new HttpThread(){
+            @Override
+            public void run(){
+                result[0] = doQueryDDL(Token, course_id);
+                Log.d("QueryDDL", result[0]);
+            }
+        };
+        thread.start();
+
+        //我没有拿到过后端返回给我的数据所以具体是什么数据格式我不太清楚
+        //这里我假设他把所有的ddl都作为JSONArray返回给我
+        try {
+            Thread.sleep( 1000 );
+        } catch (Exception e){
+            System.exit( 0 ); //退出程序
+        }
+        JSONObject json = new JSONObject(result[0]);
+        Iterator iterator = json.keys();
+        Vector<JSONArray> DDL_JSON = new Vector<JSONArray>();
+        while(iterator.hasNext()){
+            String key = (String) iterator.next();
+            DDL_JSON.add(json.getJSONArray(key));
+        }
+
+        int size = DDL_JSON.size();
+        ddl_id = new int[size];
+        ddl_time = new String[size];
+        ddl_content = new String[size];
+        ddl_state = new Boolean[size];
+        for (int i = 0; i < size; i++) {
+            ddl_id[i] = (int) DDL_JSON.get(i).get(0);
+            ddl_time[i] = (String) DDL_JSON.get(i).get(3);
+            ddl_content[i] = (String) DDL_JSON.get(i).get(2);
+            if ((int)DDL_JSON.get(i).get(4) == 0) {
+                ddl_state[i] = false;
+            }else {ddl_state[i] = true;}
         }
     }
 
@@ -118,19 +175,13 @@ public class DeadlineActivity extends AppCompatActivity {
     }
     //-生成内容按钮列表
     private void create_button_content(){
-        //按钮设置
-        GradientDrawable draw = new GradientDrawable();
-        draw.setShape(GradientDrawable.RECTANGLE);
-        draw.setColor(0xFF8B0012);
-        draw.setCornerRadius(20);
         //定位第一个控件的位置
         buttons_content[0] = new Button(this);
         //属性
-        if (ddl_content[0].length() > 12) {
-            buttons_content[0].setText(Html.fromHtml(ddl_content[0].substring(0,12)+"..."));
+        if (ddl_content[0].length() > 15) {
+            buttons_content[0].setText(Html.fromHtml(ddl_content[0].substring(0,15)+"..."));
         }//只显示前15个字
         else buttons_content[0].setText(ddl_content[0]);
-        buttons_content[0].setBackground(draw);
         buttons_content[0].setTextColor(Color.WHITE);
         buttons_content[0].setId(IDUtils.generateViewId());
         //定位
@@ -148,11 +199,10 @@ public class DeadlineActivity extends AppCompatActivity {
             //以第一个为准编写剩余控件
             buttons_content[i] = new Button(this);
             //属性
-            if (ddl_content[i].length() > 12) {
-                buttons_content[i].setText(Html.fromHtml(ddl_content[i].substring(0,12)+"..."));
+            if (ddl_content[i].length() > 15) {
+                buttons_content[i].setText(Html.fromHtml(ddl_content[i].substring(0,15)+"..."));
             }//只显示前10个字
             else buttons_content[i].setText(ddl_content[i]);
-            buttons_content[i].setBackground(draw);
             buttons_content[i].setTextColor(Color.WHITE);
             buttons_content[i].setId(IDUtils.generateViewId());
             //定位
@@ -189,8 +239,11 @@ public class DeadlineActivity extends AppCompatActivity {
                     intent.putExtra("hour", split_time[3]);
                     intent.putExtra("minute", split_time[4]);
                     intent.putExtra("content", ddl_content[finalI]);
-                    intent.putExtra("rough_data", ddl_time[finalI]);
+                    intent.putExtra("DDLid", String.valueOf(ddl_id[finalI]));
+                    intent.putExtra("state", String.valueOf(ddl_state[finalI]));
                     intent.putExtra("cid", course_id);
+                    intent.putExtra("course_name", course_name);
+                    intent.putExtra("rough_data", ddl_time[finalI]);
                     startActivity(intent);
                     DeadlineActivity.this.finish();
                 }

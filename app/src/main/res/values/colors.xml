@@ -17,4 +17,5 @@
     <color name="gainsboro">#DCDCDC</color>
     <color name="light_goldenrod">#EEDD82</color>
     <color name="goldenrod">#FFC125</color>
+    <color name="grey">#D7D7D7</color>
 </resources>

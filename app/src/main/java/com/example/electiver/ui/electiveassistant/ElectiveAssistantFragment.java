@@ -69,7 +69,6 @@ public class ElectiveAssistantFragment extends Fragment {
         screenWidth = getContext().getResources().getDisplayMetrics().widthPixels;
 
         Button start_search = (Button)view.findViewById(R.id.assis_search);
-        Button end_search = (Button)view. findViewById(R.id.assis_search_end);
 
         Spinner spin_category = (Spinner)view.findViewById(R.id.spin_category);
         Spinner spin_department = (Spinner)view.findViewById(R.id.spin_coursedepart);
@@ -123,21 +122,21 @@ public class ElectiveAssistantFragment extends Fragment {
                         searchwhich=-1;
                     }else{
 
-                        Toast.makeText(getContext(),"请点击显示查看推荐结果",
-                                Toast.LENGTH_LONG).show();
+                        // Toast.makeText(getContext(),"请点击显示查看推荐结果",
+                        //         Toast.LENGTH_LONG).show();
                         searchwhich=0;
                     }
                 }
-                else if(searchOnCategory.equals("任选") && searchOnDepartment.equals("不选择任何学院")
-                && searchOnName.equals("")){
+                else if(searchOnCategory.equals("不限制") && searchOnDepartment.equals("不选择任何学院")
+                        && searchOnName.equals("")){
                     Toast.makeText(getContext(), "请至少选择一项筛选条件",
                             Toast.LENGTH_SHORT).show();
                     getData();
                     freshCourseList(view,mDatas);
                     searchwhich=-1;
                 }else{
-                    Toast.makeText(getContext(), "开始搜索",
-                            Toast.LENGTH_SHORT).show();
+                    // Toast.makeText(getContext(), "开始搜索",
+                    //         Toast.LENGTH_SHORT).show();
                     if(token.equals("none")){
                         Toast.makeText(getContext(), "Token失效，请重新登录",
                                 Toast.LENGTH_SHORT).show();
@@ -151,7 +150,7 @@ public class ElectiveAssistantFragment extends Fragment {
                 Pair<String, String> gettoken=new Pair<>("token",token);
                 paras.add(gettoken);
 
-                if(!searchOnCategory.equals("任选")){
+                if(!searchOnCategory.equals("不限制")){
                     Pair<String, String> getpara=new Pair<>("category",searchOnCategory);
                     paras.add(getpara);
                 }
@@ -165,7 +164,7 @@ public class ElectiveAssistantFragment extends Fragment {
                 }
 
                 int finalSearchwhich = searchwhich;
-                new HttpThread(){
+                Thread t = new HttpThread(){
                     @Override
                     public void run(){
                         String filename = "tmpCourseData.txt";
@@ -207,13 +206,14 @@ public class ElectiveAssistantFragment extends Fragment {
                             }
                         }
                     }
-                }.start();
-            }
-        });
+                };
+                t.start();
 
-        end_search.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+                try {
+                    t.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 SharedPreferences saveResult= getActivity().getSharedPreferences("courseInfo",getActivity().MODE_PRIVATE);
                 String getResult;
                 try{
@@ -266,11 +266,10 @@ public class ElectiveAssistantFragment extends Fragment {
                 }catch(IOException e){
                     e.printStackTrace();
                 }
-
-
-
             }
         });
+
+
 
         getData();
         freshCourseList(view,mDatas);
